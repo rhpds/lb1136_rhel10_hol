@@ -1,0 +1,10 @@
+---
+- block:
+  - name: Create the user on node3
+    when: inventory_hostname in groups['nodes']
+    ansible.builtin.user:
+      name: "{{ student_name }}"
+      state: present
+      shell: /bin/bash
+      password: "{{ common_password | password_hash }}"
+  become: true
