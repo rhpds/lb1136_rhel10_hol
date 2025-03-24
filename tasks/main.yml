@@ -18,3 +18,5 @@
       version: "sunnit-2025"
       clone: yes
   become: true
+  ## ignore failures during debug
+  ignore_errors: yes
