@@ -7,16 +7,17 @@
       state: present
       shell: /bin/bash
       password: "{{ common_password | password_hash }}"
-  become: true
 
-- block:      
-  - name: git clone course repo to bastion
-    when: inventory_hostname in groups['bastion']
+  - name: git clone course repo to node1
     ansible.builtin.git:
       repo: "https://github.com/xtophd/RHEL10-Workshop.git"
       dest: "/root/RHEL10-Workshop"
       version: "sunnit-2025"
       clone: yes
+    when: 
+      - inventory_hostname in groups['nodes']
+      - inventory_hostname_short == 'node1'
+    ignore_errors: yes
+ 
   become: true
-  ## ignore failures during debug
-  ignore_errors: yes
+
