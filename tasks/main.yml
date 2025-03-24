@@ -9,6 +9,11 @@
       password: "{{ common_password | password_hash }}"
 
 - block:
+  - name: Install minimal packages
+    package: 
+      name: ansible-core,rhel-system-roles,tmux,git 
+      state: installed
+
   - name: git clone course repo to node1
     ansible.builtin.git:
       repo: "https://github.com/xtophd/RHEL10-Workshop.git"
