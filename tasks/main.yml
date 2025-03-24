@@ -1,10 +1,20 @@
 ---
 - block:
-  - name: Create the user on node3
+  - name: Create the user on nodes
     when: inventory_hostname in groups['nodes']
     ansible.builtin.user:
       name: "{{ student_name }}"
       state: present
       shell: /bin/bash
       password: "{{ common_password | password_hash }}"
+  become: true
+
+- block:      
+  - name: git clone course repo to bastion
+    when: inventory_hostname in groups['bastion']
+    ansible.builtin.git:
+      repo: "https://github.com/xtophd/RHEL10-Workshop.git"
+      dest: "/root/RHEL10-Workshop"
+      version: "sunnit-2025"
+      clone: yes
   become: true
