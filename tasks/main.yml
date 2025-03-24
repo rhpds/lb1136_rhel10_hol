@@ -9,14 +9,21 @@
       password: "{{ common_password | password_hash }}"
 
 - block:
+  - name: "rhel9-prep : TEMPLATE /etc/motd (incomplete)"
+    ansible.builtin.template:
+      src: motd-incomplete.j2
+      dest: /etc/motd
+      owner: root
+      group: root
+      mode: 0644
 
-- name: "rhel9-prep : TEMPLATE /etc/motd (incomplete)"
-  ansible.builtin.template:
-    src: motd-incomplete.j2
-    dest: /etc/motd
-    owner: root
-    group: root
-    mode: 0644
+  
+  ## ignore errors during debug
+  ignore_errors: yes
+  become: true
+  when: 
+    - inventory_hostname in groups['nodes']
+    - inventory_hostname_short == 'node1'
 
 
 #  - name: Install minimal packages
@@ -55,10 +62,4 @@
 #      - "{{ groups['bastions'][0] }}"
 #      - "{{ groups['nodes'] }}"
 
-  ## ignore errors during debug
-  ignore_errors: yes
-  become: true
-  when: 
-    - inventory_hostname in groups['nodes']
-    - inventory_hostname_short == 'node1'
 
