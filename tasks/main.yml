@@ -12,7 +12,7 @@
     ansible.builtin.git:
       repo: "https://github.com/xtophd/RHEL10-Workshop.git"
       dest: "/root/RHEL10-Workshop"
-      version: "sunnit-2025"
+      version: "summit-2025"
       clone: yes
     when: 
       - inventory_hostname in groups['nodes']
