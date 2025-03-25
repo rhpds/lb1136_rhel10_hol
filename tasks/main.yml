@@ -1,6 +1,6 @@
 ---
 
-# Every host been touched by the role should create a progress log
+# Every host touched by the role should create a progress log
 - name: Create file to log setup progress
   ansible.builtin.copy:
     dest: "/var/tmp/lb1136-progress.log"
