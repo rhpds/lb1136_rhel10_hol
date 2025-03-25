@@ -1,4 +1,14 @@
 ---
+
+# Every host been touched by the role should create a progress log
+- name: Create file to log setup progress
+  ansible.builtin.copy:
+    dest: "/var/tmp/lb1136-progress.log"
+    content: |
+        lb1136_rhel10_hol role processing started
+        {{ ansible_hostname }}
+
+# Every host in group 'nodes'
 - block:
   - name: Create the user on nodes
     when: inventory_hostname in groups['nodes']
@@ -8,6 +18,8 @@
       shell: /bin/bash
       password: "{{ common_password | password_hash }}"
 
+# Host in group 'nodes' and hostname equals 'node1'
+#   don't allow errors to block deployment
 - block:
   - name: "rhel9-prep : TEMPLATE /etc/motd (incomplete)"
     ansible.builtin.template:
@@ -17,8 +29,6 @@
       group: root
       mode: 0644
 
-  
-  ## ignore errors during debug
   ignore_errors: yes
   become: true
   when: 
