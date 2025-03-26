@@ -13,7 +13,7 @@
     create: true
     insertafter: EOF
     dest: "/var/tmp/lb1136-progress.log"
-    line: "lb1136_rhel10_hol role processing started"
+    line: "[{{ ansible_hostname }}] lb1136_rhel10_hol role processing on {{ groups.nodes }}"
 
 # Every host in group 'nodes'
 - block:
@@ -24,7 +24,7 @@
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "working on node1"
+        line: "[{{ ansible_hostname }}] working on node1"
 
     - name: rhel10_setup - create student user
       ansible.builtin.user:
@@ -33,7 +33,8 @@
         shell: /bin/bash
         password: "{{ common_password | password_hash }}"
       
-  when: inventory_hostname in groups['nodes']
+  when: 
+    - inventory_hostname in groups['nodes']
 
 # Every host in group 'nodes' except 'leapp'
 - block:
@@ -44,7 +45,7 @@
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "working on all nodes except"
+        line: "[{{ ansible_hostname }}] working on all nodes except leapp"
       
     - name: rhel10_setup - install minimum package requirements
       ansible.builtin.package: 
@@ -63,7 +64,7 @@
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "working on node1"
+        line: "[{{ ansible_hostname }}] working on node1"
         
   ignore_errors: yes
   become: true
