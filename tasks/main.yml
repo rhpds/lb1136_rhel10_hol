@@ -33,14 +33,28 @@
         shell: /bin/bash
         password: "{{ common_password | password_hash }}"
       
+  when: inventory_hostname in groups['nodes']
+
+# Every host in group 'nodes' except 'leapp'
+- block:
+
+    - name: "rhel10_setup - working on group 'nodes' except 'leapp'"
+      lineinfile:
+        state: present
+        create: true
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "working on all nodes except"
+      
     - name: rhel10_setup - install minimum package requirements
       ansible.builtin.package: 
         name: ansible-core,rhel-system-roles,tmux,git 
         state: installed
 
-  when: inventory_hostname in groups['nodes']
+  when: 
+    - inventory_hostname in groups['nodes']
+    - inventory_hostname_short != 'leapp'
 
-  
 # Only 'node1'
 - block:
   - name: "rhel10_setup - working on 'node1'"
