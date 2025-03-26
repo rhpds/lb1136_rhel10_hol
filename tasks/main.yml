@@ -15,16 +15,15 @@
     dest: "/var/tmp/lb1136-progress.log"
     line: "[{{ ansible_hostname }}] lb1136_rhel10_hol role processing"
 
-# Every host in group 'nodes'
 - block:
 
-    - name: "rhel10_setup - working on group 'nodes'"
+    - name: "rhel10_setup - working on hostgroup 'nodes'"
       lineinfile:
         state: present
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "[{{ ansible_hostname }}] working on group nodes which includes {{ groups.nodes }}"
+        line: "[{{ ansible_hostname }}] working on hostgroup 'nodes' which includes {{ groups.nodes }}"
 
     - name: rhel10_setup - create student user
       ansible.builtin.user:
@@ -39,7 +38,7 @@
 # Every host in group 'nodes' except 'leapp'
 - block:
 
-    - name: "rhel10_setup - working on group 'nodes' except 'leapp'"
+    - name: "rhel10_setup - working on hostgroup 'nodes' except 'leapp'"
       lineinfile:
         state: present
         create: true
@@ -58,7 +57,7 @@
 
 # Only 'node1'
 - block:
-  - name: "rhel10_setup - working only on 'node1'"
+  - name: "rhel10_setup - working only on node 'node1'"
     lineinfile:
         state: present
         create: true
