@@ -65,18 +65,21 @@
         dest: "/var/tmp/lb1136-progress.log"
         line: "[{{ ansible_hostname }}] working only on node1"
         
+  - name: git clone course repo to node1
+    ansible.builtin.git:
+      repo: "https://github.com/xtophd/RHEL10-Workshop.git"
+      dest: "/root/RHEL10-Workshop"
+      version: "summit-2025"
+      clone: yes
+
+
+        
   ignore_errors: yes
   become: true
   when: 
     - inventory_hostname in groups['nodes']
     - inventory_hostname_short == 'node1'
 
-#  - name: git clone course repo to node1
-#    ansible.builtin.git:
-#      repo: "https://github.com/xtophd/RHEL10-Workshop.git"
-#      dest: "/root/RHEL10-Workshop"
-#      version: "summit-2025"
-#      clone: yes
   
 #  - name: Create gpte-guid config file
 #    copy:
