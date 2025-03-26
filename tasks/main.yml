@@ -1,7 +1,7 @@
 ---
 
 - ansible.builtin.debug:
-    msg: "## BEGIN SETUP ROLE for: The Definitive RHEL10 Hands-On Lab"
+    msg: "## rhel10_setup - start role lb1136_rhel10_hol 'The Definitive RHEL10 Hands-On Lab'"
 
 ##
 ##    Every host touched by the role should create a progress log
