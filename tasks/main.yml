@@ -1,45 +1,61 @@
 ---
 
-# Every host touched by the role should create a progress log
-- name: Create file to log setup progress
-  ansible.builtin.copy:
+- ansible.builtin.debug:
+    msg: "## BEGIN SETUP ROLE for: The Definitive RHEL10 Hands-On Lab"
+
+##
+##    Every host touched by the role should create a progress log
+##
+
+- name: "rhel10_setup - create progress log"
+  ansible.builtin.lineinfile:
+    state: present
+    create: ture
+    insertafter: EOF
     dest: "/var/tmp/lb1136-progress.log"
-    content: |
-        lb1136_rhel10_hol role processing started
-        {{ ansible_hostname }}
+    line: "lb1136_rhel10_hol role processing started"
 
 # Every host in group 'nodes'
 - block:
-  - name: Create the user on nodes
-    when: inventory_hostname in groups['nodes']
-    ansible.builtin.user:
-      name: "{{ student_name }}"
-      state: present
-      shell: /bin/bash
-      password: "{{ common_password | password_hash }}"
 
-# Host in group 'nodes' and hostname equals 'node1'
-#   don't allow errors to block deployment
+    - name: "rhel10_setup - working on group 'nodes'"
+      lineinfile:
+        state: present
+        create: ture
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "working on node1"
+
+    - name: rhel10_setup - create student user
+      ansible.builtin.user:
+        name: "{{ student_name }}"
+        state: present
+        shell: /bin/bash
+        password: "{{ common_password | password_hash }}"
+      
+    - name: rhel10_setup - install minimum package requirements
+      ansible.builtin.package: 
+        name: ansible-core,rhel-system-roles,tmux,git 
+        state: installed
+
+  when: inventory_hostname in groups['nodes']
+
+  
+# Only 'node1'
 - block:
-  - name: "rhel9-prep : TEMPLATE /etc/motd (incomplete)"
-    ansible.builtin.template:
-      src: motd-incomplete.j2
-      dest: /etc/motd
-      owner: root
-      group: root
-      mode: 0644
-
+  - name: "rhel10_setup - working on 'node1'"
+    lineinfile:
+        state: present
+        create: ture
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "working on node1"
+        
   ignore_errors: yes
   become: true
   when: 
     - inventory_hostname in groups['nodes']
     - inventory_hostname_short == 'node1'
-
-
-#  - name: Install minimal packages
-#    package: 
-#      name: ansible-core,rhel-system-roles,tmux,git 
-#      state: installed
 
 #  - name: git clone course repo to node1
 #    ansible.builtin.git:
