@@ -10,7 +10,7 @@
 - name: "rhel10_setup - create progress log"
   ansible.builtin.lineinfile:
     state: present
-    create: ture
+    create: true
     insertafter: EOF
     dest: "/var/tmp/lb1136-progress.log"
     line: "lb1136_rhel10_hol role processing started"
@@ -21,7 +21,7 @@
     - name: "rhel10_setup - working on group 'nodes'"
       lineinfile:
         state: present
-        create: ture
+        create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
         line: "working on node1"
@@ -46,7 +46,7 @@
   - name: "rhel10_setup - working on 'node1'"
     lineinfile:
         state: present
-        create: ture
+        create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
         line: "working on node1"
