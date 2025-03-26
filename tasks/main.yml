@@ -24,7 +24,7 @@
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "[{{ ansible_hostname }}] working on group nodes which includes {{ group.nodes }}"
+        line: "[{{ ansible_hostname }}] working on group nodes which includes {{ groups.nodes }}"
 
     - name: rhel10_setup - create student user
       ansible.builtin.user:
