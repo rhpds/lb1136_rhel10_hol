@@ -65,7 +65,7 @@
         dest: "/var/tmp/lb1136-progress.log"
         line: "[{{ ansible_hostname }}] working only on node1"
 
-  -name: "rhel10-setup - dumping hostvars"
+  - name: "rhel10-setup - dumping hostvars"
     copy:
       destination: "/var/tmp/ll1136-hostvars.yml"
       content: "{{ hostvars | to_nice_yml }}"
