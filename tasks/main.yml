@@ -95,12 +95,16 @@
       mode: "400"
       content: "{{ student_password }}"
 
+  #- name: "rhel10-setup - create gpte-subdomain-internal config file"
+  #  ansible.builtin.copy:
+  #    dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
+  #    mode: "400"
+  #    content: "{{ subdomain_internal }}"
+
   - name: "rhel10-setup - create gpte-subdomain-internal config file"
-    ansible.builtin.copy:
-      dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
-      mode: "400"
-      content: "{{ subdomain_internal }}"
-          
+    shell:
+      cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }} > /root/RHEL10-Workshop/config/gpte-subdomain-internal.txt
+             
   - name: "rhel10-setup - create gpte-pub-fqdn-shortname config files"
     vars:
       shortname: "{{ item | regex_replace('\\..*$') }}"
