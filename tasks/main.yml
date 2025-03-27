@@ -65,14 +65,36 @@
         dest: "/var/tmp/lb1136-progress.log"
         line: "[{{ ansible_hostname }}] working only on node1"
         
-  - name: git clone course repo to node1
+  - name: "rhel10-setup - git clone course repo"
     ansible.builtin.git:
       repo: "https://github.com/xtophd/RHEL10-Workshop.git"
       dest: "/root/RHEL10-Workshop"
       version: "summit-2025"
       clone: yes
 
-
+  - name: "rhel10-setup - create gpte-guid config file"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-guid.txt"
+      mode: "400"
+      content: "{{ guid }}"
+  
+  - name: "rhel10-setup - create gpte-studentpw config file"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-studentpw.txt"
+      mode: "400"
+      content: "{{ student_password }}"
+    
+  - name: "rhel10-setup - create gpte-pub-fqdn-shortname config files"
+    vars:
+      shortname: "{{ item | regex_replace('\\..*$') }}"
+      hostname: "{{ item | regex_replace('\\..*$') }}.{{ guid }}{{ subdomain_base_suffix }}"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-pub-fqdn-{{ shortname }}.txt"
+      mode: "400"
+      content: "{{ hostname }}"
+    with_items:
+      - "{{ groups['nodes'] }}"
+#      - "{{ groups['bastions'][0] }}"
         
   ignore_errors: yes
   become: true
@@ -81,28 +103,5 @@
     - inventory_hostname_short == 'node1'
 
   
-#  - name: Create gpte-guid config file
-#    copy:
-#      dest: "/root/RHEL10-Workshop/config/gpte-guid.txt"
-#      mode: "400"
-#      content: "{{ guid }}"
-  
-#  - name: Create gpte-studentpw config file
-#    copy:
-#      dest: "/root/RHEL10-Workshop/config/gpte-studentpw.txt"
-#      mode: "400"
-#      content: "{{ student_password }}"
-    
-#  - name: Create gpte-pub-fqdn-shortname config files
-#    vars:
-#      shortname: "{{ item | regex_replace('\\..*$') }}"
-#      hostname: "{{ item | regex_replace('\\..*$') }}.{{ guid }}{{ subdomain_base_suffix }}"
-#    copy:
-#      dest: "/root/RHEL10-Workshop/config/gpte-pub-fqdn-{{ shortname }}.txt"
-#      mode: "400"
-#      content: "{{ hostname }}"
-#    with_items:
-#      - "{{ groups['bastions'][0] }}"
-#      - "{{ groups['nodes'] }}"
 
 
