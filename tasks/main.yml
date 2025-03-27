@@ -77,7 +77,13 @@
       dest: "/root/RHEL10-Workshop/config/gpte-guid.txt"
       mode: "400"
       content: "{{ guid }}"
-  
+
+  - name: "rhel10-setup - create gpte-student config file"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-student.txt"
+      mode: "400"
+      content: "{{ student_name }}"
+
   - name: "rhel10-setup - create gpte-studentpw config file"
     ansible.builtin.copy:
       dest: "/root/RHEL10-Workshop/config/gpte-studentpw.txt"
