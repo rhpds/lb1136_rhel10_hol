@@ -89,6 +89,23 @@
       dest: "/root/RHEL10-Workshop/config/gpte-studentpw.txt"
       mode: "400"
       content: "{{ student_password }}"
+
+  - name: "rhel10-setup - create gpte-subdomain-internal config file"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
+      mode: "400"
+      content: "{{ subdomain_internal }}"
+      
+  - name: "rhel10-setup - create gpte-int-fqdn-shortname config files"
+    vars:
+      shortname: "{{ item | regex_replace('\\..*$') }}"
+      hostname: "{{ item | regex_replace('\\..*$') }}.{{ subdomain_internal }}"
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-pub-fqdn-{{ shortname }}.txt"
+      mode: "400"
+      content: "{{ hostname }}"
+    with_items:
+      - "{{ groups['nodes'] }}"
     
   - name: "rhel10-setup - create gpte-pub-fqdn-shortname config files"
     vars:
