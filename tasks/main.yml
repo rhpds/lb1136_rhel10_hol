@@ -48,7 +48,7 @@
       
     - name: rhel10_setup - install minimum package requirements
       ansible.builtin.package: 
-        name: ansible-core,rhel-system-roles,tmux,git 
+        name: ansible-core,rhel-system-roles,tmux,git,bind-utils 
         state: installed
 
   when: 
