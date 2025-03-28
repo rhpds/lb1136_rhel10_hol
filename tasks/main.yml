@@ -116,6 +116,12 @@
     with_items:
       - "{{ groups['nodes'] }}"
 #      - "{{ groups['bastions'][0] }}"
+
+  - name: "rhel10-setup - create link to gpte config"
+    file:
+      src: "/root/RHEL10-Workshop/sample-configs/gpte/config/master-config.yml"
+      destination: "/root/RHEL10-Workshop/config/master-config.yml"
+      state: link
         
   ignore_errors: yes
   become: true
