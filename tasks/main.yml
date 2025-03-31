@@ -121,7 +121,7 @@
 
   - name: "rhel10-setup - create link to gpte config"
     file:
-      src: "/root/RHEL10-Workshop/sample-configs/gpte/config/master-config.yml"
+      src: "/root/RHEL10-Workshop/sample-configs/gpte/master-config.yml"
       dest: "/root/RHEL10-Workshop/config/master-config.yml"
       state: link
         
