@@ -69,7 +69,7 @@
 
   - name: "rhel10-setup - dumping hostvars"
     copy:
-      dest: "/var/tmp/ll1136-hostvars.yml"
+      dest: "/var/tmp/lb1136-hostvars.yml"
       content: "{{ hostvars | to_nice_yaml }}"
         
   - name: "rhel10-setup - git clone course repo"
