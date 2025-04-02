@@ -22,6 +22,15 @@
       ansible.builtin.set_fact: 
         internal_domain: "{{ domain_result.stdout }}
 
+    - name: "rhel10-setup - fetch pub ssh keys from bastion"
+      delegate_to: "{{ groups['bastions'][0] }}"
+      ansible.builtin.shell:
+        cmd: cat ~{{ student_user }}/.ssh/*.pub
+      register: pubkeys_result
+
+    - name: "rhel10-setup - set fact internal_domain"
+      ansible.builtin.set_fact: 
+        bastion_pubkeys: "{{ pubkeys_result.stdout }}
 
 
 # Every host in group 'nodes'
@@ -85,6 +94,12 @@
     ignore_errors: yes
     become: yes
     become_user: "{{ student_name }}"
+
+  - name: "rhel10_setup - setup up authorized_keys for {{ student_user }}"
+    ansible.builtin.copy:
+      dest: "~{{ student_users }}/.ssh/authorized_keys"
+      mode: "400"
+      content: "{{ bastion_pubkeys }}"
       
   when: 
     - inventory_hostname in groups['nodes']
