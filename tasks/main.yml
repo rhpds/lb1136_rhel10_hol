@@ -30,7 +30,7 @@
 
     - name: "rhel10-setup - set fact internal_domain"
       ansible.builtin.set_fact: 
-        bastion_pubkeys: "{{ pubkeys_result.stdout }}
+        bastion_pubkeys: "{{ pubkeys_result.stdout }}"
 
 
 # Every host in group 'nodes'
