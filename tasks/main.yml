@@ -62,7 +62,7 @@
     - name: "rhel10_setup : check ssh known_hosts permissions"
       ansible.builtin.file:
         path: "~{{ student_name }}/.ssh/known_hosts"
-        mode: "0700"
+        mode: "0400"
         owner: "{{ student_name }}"
         group: "{{ student_name }}"
         state: touch
@@ -99,6 +99,8 @@
       ansible.builtin.copy:
         dest: "~{{ student_name }}/.ssh/authorized_keys"
         mode: "400"
+        owner: "{{ student_name }}"
+        group: "{{ student_name }}"
         content: "{{ bastion_pubkeys }}"
       
   when: 
