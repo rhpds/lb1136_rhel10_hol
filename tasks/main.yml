@@ -67,39 +67,39 @@
         group: "{{ student_name }}"
         state: touch
 
-  - name: "rhel10_setup : clean up known_hosts for {{ student_name }}"
-    vars:
-      p_file: "~{{ student_name }}/.ssh/known_hosts"
-    ansible.builtin.shell:
-      cmd: |
-        ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}
-        ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }}
-    with_items:
-      - "{{ groups['bastions'] }}"
-      - "{{ groups['nodes'] }}"
-    ignore_errors: yes
-    become: yes
-    become_user: "{{ student_name }}"
+    - name: "rhel10_setup : clean up known_hosts for {{ student_name }}"
+      vars:
+        p_file: "~{{ student_name }}/.ssh/known_hosts"
+      ansible.builtin.shell:
+        cmd: |
+          ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}
+          ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }}
+      with_items:
+        - "{{ groups['bastions'] }}"
+        - "{{ groups['nodes'] }}"
+      ignore_errors: yes
+      become: yes
+      become_user: "{{ student_name }}"
 
-  - name: "rhel10_setup: scan and add ssh keys to known_hosts for {{ student_name }}"
-    vars:
-      p_file: "~{{ student_name }}/.ssh/known_hosts"
-    ansible.builtin.shell:
-      cmd: |
-        ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }} >> {{ p_file }}
-        ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }} >> {{ p_file }}
-    with_items:
-      - "{{ groups['bastions'] }}"
-      - "{{ groups['nodes'] }}"
-    ignore_errors: yes
-    become: yes
-    become_user: "{{ student_name }}"
+    - name: "rhel10_setup: scan and add ssh keys to known_hosts for {{ student_name }}"
+      vars:
+        p_file: "~{{ student_name }}/.ssh/known_hosts"
+      ansible.builtin.shell:
+        cmd: |
+          ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }} >> {{ p_file }}
+          ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }} >> {{ p_file }}
+      with_items:
+        - "{{ groups['bastions'] }}"
+        - "{{ groups['nodes'] }}"
+      ignore_errors: yes
+      become: yes
+      become_user: "{{ student_name }}"
 
-  - name: "rhel10_setup - setup up authorized_keys for {{ student_user }}"
-    ansible.builtin.copy:
-      dest: "~{{ student_users }}/.ssh/authorized_keys"
-      mode: "400"
-      content: "{{ bastion_pubkeys }}"
+    - name: "rhel10_setup - setup up authorized_keys for {{ student_user }}"
+      ansible.builtin.copy:
+        dest: "~{{ student_users }}/.ssh/authorized_keys"
+        mode: "400"
+        content: "{{ bastion_pubkeys }}"
       
   when: 
     - inventory_hostname in groups['nodes']
