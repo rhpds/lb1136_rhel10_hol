@@ -20,7 +20,7 @@
 
     - name: "rhel10-setup - set fact internal_domain"
       ansible.builtin.set_fact: 
-        internal_domain: "{{ domain_result.stdout }}
+        internal_domain: "{{ domain_result.stdout }}"
 
     - name: "rhel10-setup - fetch pub ssh keys from bastion"
       delegate_to: "{{ groups['bastions'][0] }}"
