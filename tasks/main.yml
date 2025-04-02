@@ -103,16 +103,16 @@
         group: "{{ student_name }}"
         content: "{{ bastion_pubkeys }}"
         
-    - name: "rhel10_setup - configure sudoers for {{ student-name }}"
+    - name: "rhel10_setup - configure sudoers for {{ student_name }}"
       ansible.builtin.lineinfile:
         state: present
         create: true
         insertafter: EOF
-        dest: "/etc/sudoers.d/{{ student-name }}"
+        dest: "/etc/sudoers.d/{{ student_name }}"
         mode: "640"
         owner: "root"
         group: "root"
-        line: "{{ student-name }} ALL=(ALL) NOPASSWD: ALL"
+        line: "{{ student_name }} ALL=(ALL) NOPASSWD: ALL"
         
   when: 
     - inventory_hostname in groups['nodes']
