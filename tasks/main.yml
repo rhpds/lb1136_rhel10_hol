@@ -3,22 +3,32 @@
 - ansible.builtin.debug:
     msg: "## rhel10_setup - start role lb1136_rhel10_hol 'The Definitive RHEL10 Hands-On Lab'"
 
-##
-##    Every host touched by the role should create a progress log
-##
+# Every host touched by the role
+- block:
+    - name: "rhel10_setup - create progress log"
+      ansible.builtin.lineinfile:
+        state: present
+        create: true
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "[{{ ansible_hostname }}] lb1136_rhel10_hol role processing"
 
-- name: "rhel10_setup - create progress log"
-  ansible.builtin.lineinfile:
-    state: present
-    create: true
-    insertafter: EOF
-    dest: "/var/tmp/lb1136-progress.log"
-    line: "[{{ ansible_hostname }}] lb1136_rhel10_hol role processing"
+    - name: "rhel10-setup - determine subdomain-internal from resolv.conf"
+      ansible.builtin.shell:
+        cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }}
+      register: domain_result
 
+    - name: "rhel10-setup - set fact internal_domain"
+      ansible.builtin.set_fact: 
+        internal_domain: "{{ domain_result.stdout }}
+
+
+
+# Every host in group 'nodes'
 - block:
 
     - name: "rhel10_setup - working on hostgroup 'nodes'"
-      lineinfile:
+      ansible.builtin.lineinfile:
         state: present
         create: true
         insertafter: EOF
@@ -31,15 +41,61 @@
         state: present
         shell: /bin/bash
         password: "{{ common_password | password_hash }}"
+
+    - name: "rhel10_setup : check ssh directory permissions"
+      ansible.builtin.file:
+        path: ~{{ student_name }}/.ssh
+        mode: "0700"
+        owner: "{{ student_name }}"
+        group: "{{ student_name }}"
+        state: directory
+
+    - name: "rhel10_setup : check ssh known_hosts permissions"
+      ansible.builtin.file:
+        path: "~{{ item }}/.ssh/known_hosts"
+        mode: "0700"
+        owner: "{{ student_name }}"
+        group: "{{ student_name }}"
+        state: touch
+
+  - name: "rhel10_setup : clean up known_hosts for {{ student_name }}"
+    vars:
+      p_file: "~{{ student_name }}/.ssh/known_hosts"
+    ansible.builtin.shell:
+      cmd: |
+        ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}
+        ssh-keygen -f {{ p_file }} -R {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }}
+    with_items:
+      - "{{ groups['bastions'] }}"
+      - "{{ groups['nodes'] }}"
+    ignore_errors: yes
+    become: yes
+    become_user: "{{ student_name }}"
+
+  - name: "rhel10_setup: scan and add ssh keys to known_hosts for {{ student_name }}"
+    vars:
+      p_file: "~{{ student_name }}/.ssh/known_hosts"
+    ansible.builtin.shell:
+      cmd: |
+        ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }} >> {{ p_file }}
+        ssh-keyscan {{ hostvars[item]['inventory_hostname_short'] }}.{{ internal_domain }} >> {{ p_file }}
+    with_items:
+      - "{{ groups['bastions'] }}"
+      - "{{ groups['nodes'] }}"
+    ignore_errors: yes
+    become: yes
+    become_user: "{{ student_name }}"
       
   when: 
     - inventory_hostname in groups['nodes']
+
+
 
 # Every host in group 'nodes' except 'leapp'
 - block:
 
     - name: "rhel10_setup - working on hostgroup 'nodes' except 'leapp'"
-      lineinfile:
+      ansible.builtin.lineinfile:
         state: present
         create: true
         insertafter: EOF
@@ -57,10 +113,12 @@
     - inventory_hostname in groups['nodes']
     - inventory_hostname_short != 'leapp'
 
+
+
 # Only 'node1'
 - block:
   - name: "rhel10_setup - working only on node 'node1'"
-    lineinfile:
+    ansible.builtin.lineinfile:
         state: present
         create: true
         insertafter: EOF
@@ -68,7 +126,7 @@
         line: "[{{ ansible_hostname }}] working only on node1"
 
   - name: "rhel10-setup - dumping hostvars"
-    copy:
+    ansible.builtin.copy:
       dest: "/var/tmp/lb1136-hostvars.yml"
       content: "{{ hostvars | to_nice_yaml }}"
         
@@ -97,16 +155,12 @@
       mode: "400"
       content: "{{ student_password }}"
 
-  #- name: "rhel10-setup - create gpte-subdomain-internal config file"
-  #  ansible.builtin.copy:
-  #    dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
-  #    mode: "400"
-  #    content: "{{ subdomain_internal }}"
-
   - name: "rhel10-setup - create gpte-subdomain-internal config file"
-    shell:
-      cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }} > /root/RHEL10-Workshop/config/gpte-subdomain-internal.txt
-             
+    ansible.builtin.copy:
+      dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
+      mode: "400"
+      content: "{{ internal_domain }}"
+    
   - name: "rhel10-setup - create gpte-pub-fqdn-shortname config files"
     vars:
       shortname: "{{ item | regex_replace('\\..*$') }}"
@@ -117,7 +171,7 @@
       content: "{{ hostname }}"
     with_items:
       - "{{ groups['nodes'] }}"
-#      - "{{ groups['bastions'][0] }}"
+      - "{{ groups['bastions'][0] }}"
 
   - name: "rhel10-setup - create link to gpte config"
     file:
@@ -130,7 +184,3 @@
   when: 
     - inventory_hostname in groups['nodes']
     - inventory_hostname_short == 'node1'
-
-  
-
-
