@@ -61,7 +61,7 @@
 
     - name: "rhel10_setup : check ssh known_hosts permissions"
       ansible.builtin.file:
-        path: "~{{ item }}/.ssh/known_hosts"
+        path: "~{{ student_name }}/.ssh/known_hosts"
         mode: "0700"
         owner: "{{ student_name }}"
         group: "{{ student_name }}"
