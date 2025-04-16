@@ -122,8 +122,7 @@
 
   - name: "rhel10-setup - run the minimal workshop playbooks"
     ansible.builtin.shell:
-#      cmd: cd /root/RHEL10-Workshop; ./rhel10-workshop.sh prep
-      cmd: cd /root/RHEL10-Workshop; ./rhel10-workshop.sh all
+      cmd: cd /root/RHEL10-Workshop; ./rhel10-workshop.sh prep
         
   ignore_errors: yes
   become: true
