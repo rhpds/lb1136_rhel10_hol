@@ -129,3 +129,58 @@
   when: 
     - inventory_hostname in groups['isolated']
     - inventory_hostname_short == 'node1'
+
+# Only 'node1'
+- name: Block to generate LeCertificate for node3
+  become: true
+  when: 
+    - inventory_hostname in groups['isolated']
+    - inventory_hostname_short == 'node3'
+  block:
+    - name: Install nginx
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Create Python Virtual environment 
+      ansible.builtin.include_role:
+        name: host_virtualenv
+      vars:
+        host_virtualenv_path: /opt/virtualenvs/le
+        host_virtualenv_requirements:
+          - requirements.txt
+
+    - name: Set virtualenv
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /opt/virtualenvs/le/bin/python
+
+    - name: Create Le Certificate
+      ansible.builtin.command: >-
+        certbot certonly --nginx
+        -m test@opentlc.com
+        -d node3.{{ subdomain }}
+        --noninteractive
+        --agree-tos
+
+    - name: Copy LE private key
+      ansible.builtin.copy:
+        src: /etc/letsencrypt/live/node3.{{ subdomain }}/privkey.pem
+        dest: /etc/cockpit/ws-certs.d/00-signed.key
+        remote_src: true
+
+    - name: Copy LE Certificate
+      ansible.builtin.copy:
+        src: /etc/letsencrypt/live/node3.{{ subdomain }}/fullchain.pem
+        dest: /etc/cockpit/ws-certs.d/00-signed.cert
+        remote_src: true
+   
+    - name: Webconsole service restart
+      ansible.builtin.systemd_service: 
+        name: "cockpit.socket" 
+        state: restarted 
+        enabled: yes 
+        daemon-reload: yes
+
+    - name: Set virtualenv
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/libexec/platform-python
