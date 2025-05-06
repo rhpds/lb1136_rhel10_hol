@@ -150,13 +150,13 @@
         host_virtualenv_requirements:
           - requirements.txt
 
-    - name: Set virtualenv
-      ansible.builtin.set_fact:
-        ansible_python_interpreter: /opt/virtualenvs/le/bin/python
+    # - name: Set virtualenv
+    #   ansible.builtin.set_fact:
+    #     ansible_python_interpreter: /opt/virtualenvs/le/bin/python
 
     - name: Create Le Certificate
       ansible.builtin.command: >-
-        certbot certonly --nginx
+        /opt/virtualenvs/le/bin/certbot certonly --nginx
         -m test@opentlc.com
         -d node3.{{ subdomain }}
         --noninteractive
@@ -181,6 +181,6 @@
         enabled: yes 
         daemon-reload: yes
 
-    - name: Set virtualenv
-      ansible.builtin.set_fact:
-        ansible_python_interpreter: /usr/libexec/platform-python
+    # - name: Set virtualenv
+    #   ansible.builtin.set_fact:
+    #     ansible_python_interpreter: /usr/libexec/platform-python
