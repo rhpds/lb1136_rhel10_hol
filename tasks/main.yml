@@ -130,7 +130,7 @@
     - inventory_hostname in groups['isolated']
     - inventory_hostname_short == 'node1'
 
-# Only 'node1'
+# Only 'node3'
 - name: Block to generate LeCertificate for node3
   become: true
   when: 
