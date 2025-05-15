@@ -73,7 +73,7 @@
         
   - name: "rhel10-setup - git clone course repo"
     ansible.builtin.git:
-      repo: "https://github.com/xtophd/RHEL10-Workshop.git"
+      repo: "https://github.com/rhpds/RHEL10-Workshop.git"
       dest: "/root/RHEL10-Workshop"
       version: "summit-2025"
       clone: yes
