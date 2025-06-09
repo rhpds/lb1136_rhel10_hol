@@ -46,6 +46,10 @@
     ## NOTE: ansible-playbook errors with unsupported locale, resolved by installing glibc-all-langpacks
       
     - name: rhel10_setup - install minimum package requirements
+      register: r_rhel10_setup
+      retries: 3
+      delay: 30
+      until: rhel10_setup is success
       ansible.builtin.package: 
         name: ansible-core,rhel-system-roles,tmux,git,bind-utils,glibc-all-langpacks
         state: installed
