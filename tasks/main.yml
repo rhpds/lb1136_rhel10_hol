@@ -157,6 +157,11 @@
     - name: Create Le Certificate
       ansible.builtin.command: >-
         /opt/virtualenvs/le/bin/certbot certonly --nginx
+        {% if certbot_cert_manager_provider == 'zerossl' %}
+        --eab-kid {{ certbot_cert_manager_zerossl_eab_key_id | ansible.builtin.quote }}
+        --eab-hmac-key {{ certbot_cert_manager_zerossl_hmac_key | ansible.builtin.quote }}
+        --server {{ certbot_cert_manager_acme_url | ansible.builtin.quote }}
+        {% endif %}
         -m test@opentlc.com
         -d node3.{{ subdomain }}
         --noninteractive
