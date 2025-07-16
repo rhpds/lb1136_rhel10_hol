@@ -39,12 +39,12 @@
         loop_var: file
         label: "{{ file.path }}"
 
-    - name: Restore rhsm.conf
-      ansible.builtin.copy:
-        src: /etc/rhsm/rhsm.conf.cloud_save
-        dest: /etc/rhsm/rhsm.conf
-        remote_src: true
-        mode: "0644"
+    # - name: Restore rhsm.conf
+    #   ansible.builtin.copy:
+    #     src: /etc/rhsm/rhsm.conf.cloud_save
+    #     dest: /etc/rhsm/rhsm.conf
+    #     remote_src: true
+    #     mode: "0644"
 
     - name: Remove katello facts files
       ansible.builtin.file:
