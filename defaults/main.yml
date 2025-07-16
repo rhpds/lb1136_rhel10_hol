@@ -1,2 +1,8 @@
 ---
 rhel10_hol_config: true
+
+# -----------------------------------------------
+# Register node2 with RHSM
+# -----------------------------------------------
+lb1136_rhel10_hol_sat_org: <CHANGEME>
+lb1136_rhel10_hol_sat_activation_key: <CHANGEME>

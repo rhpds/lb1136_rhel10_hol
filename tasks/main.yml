@@ -1,4 +1,7 @@
 ---
+- name: Include register with RHSM
+  ansible.builtin.include_tasks:
+    file: rhsm.yml
 
 - ansible.builtin.debug:
     msg: "## rhel10_setup - start role lb1136_rhel10_hol 'The Definitive RHEL10 Hands-On Lab'"
