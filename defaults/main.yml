@@ -7,3 +7,8 @@ rhel10_hol_config: true
 lb1136_rhel10_hol_use_rhsm_for_node2: false
 lb1136_rhel10_hol_sat_org: <CHANGEME>
 lb1136_rhel10_hol_sat_activation_key: <CHANGEME>
+
+# -----------------------------------------------
+# Issue LeCertificate for Node3
+# -----------------------------------------------
+lb1136_rhel10_hol_lecertificate_for_node3: true

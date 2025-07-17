@@ -1,0 +1,135 @@
+---
+- ansible.builtin.debug:
+    msg: "## rhel10_setup - start role lb1136_rhel10_hol 'The Definitive RHEL10 Hands-On Lab'"
+
+# Every host touched by the role
+- name: Every host touched by the role
+  block:
+    - name: "rhel10_setup - create progress log"
+      ansible.builtin.lineinfile:
+        state: present
+        create: true
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "[{{ ansible_hostname }}] lb1136_rhel10_hol role processing"
+
+    - name: "rhel10-setup - determine subdomain-internal from resolv.conf"
+      ansible.builtin.shell:
+        cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }}
+      register: domain_result
+
+    - name: "rhel10-setup - set fact internal_domain"
+      ansible.builtin.set_fact: 
+        internal_domain: "{{ domain_result.stdout }}"
+
+    - name: "rhel10-setup - fetch pub ssh keys from bastion"
+      delegate_to: "{{ groups['bastions'][0] }}"
+      ansible.builtin.shell:
+        cmd: cat ~{{ student_name }}/.ssh/*.pub
+      register: pubkeys_result
+
+    - name: "rhel10-setup - set fact internal_domain"
+      ansible.builtin.set_fact: 
+        bastion_pubkeys: "{{ pubkeys_result.stdout }}"
+
+
+# Every host in group 'isolated' except 'leapp'
+- name: Every host in group 'isolated' except 'leapp'
+  when: 
+    - inventory_hostname in groups['isolated']
+    - inventory_hostname_short != 'leapp'
+  block:
+
+    - name: "rhel10_setup - working on hostgroup 'isolated' except 'leapp'"
+      ansible.builtin.lineinfile:
+        state: present
+        create: true
+        insertafter: EOF
+        dest: "/var/tmp/lb1136-progress.log"
+        line: "[{{ ansible_hostname }}] working on group isolated except leapp"
+
+    ## NOTE: ansible-playbook errors with unsupported locale, resolved by installing glibc-all-langpacks
+      
+    - name: rhel10_setup - install minimum package requirements
+      register: r_rhel10_setup
+      retries: 3
+      delay: 30
+      until: r_rhel10_setup is success
+      ansible.builtin.package: 
+        name: ansible-core,rhel-system-roles,tmux,git,bind-utils,glibc-all-langpacks
+        state: installed
+
+# Only 'node1'
+- name: Only for node1
+  ignore_errors: true
+  become: true
+  when: 
+    - inventory_hostname in groups['isolated']
+    - inventory_hostname_short == 'node1'
+  block:
+
+    - name: "rhel10_setup - working only on node 'node1'"
+      ansible.builtin.lineinfile:
+          state: present
+          create: true
+          insertafter: EOF
+          dest: "/var/tmp/lb1136-progress.log"
+          line: "[{{ ansible_hostname }}] working only on node1"
+
+    - name: "rhel10-setup - dumping hostvars"
+      ansible.builtin.copy:
+        dest: "/var/tmp/lb1136-hostvars.yml"
+        content: "{{ hostvars | to_nice_yaml }}"
+          
+    - name: "rhel10-setup - git clone course repo"
+      ansible.builtin.git:
+        repo: "https://github.com/xtophd/RHEL10-Workshop.git"
+        dest: "/root/RHEL10-Workshop"
+        version: "rhpds-prod"
+        clone: yes
+
+    - name: "rhel10-setup - create gpte-guid config file"
+      ansible.builtin.copy:
+        dest: "/root/RHEL10-Workshop/config/gpte-guid.txt"
+        mode: "400"
+        content: "{{ guid }}"
+
+    - name: "rhel10-setup - create gpte-student config file"
+      ansible.builtin.copy:
+        dest: "/root/RHEL10-Workshop/config/gpte-student.txt"
+        mode: "400"
+        content: "{{ student_name }}"
+
+    - name: "rhel10-setup - create gpte-studentpw config file"
+      ansible.builtin.copy:
+        dest: "/root/RHEL10-Workshop/config/gpte-studentpw.txt"
+        mode: "400"
+        content: "{{ student_password }}"
+
+    - name: "rhel10-setup - create gpte-subdomain-internal config file"
+      ansible.builtin.copy:
+        dest: "/root/RHEL10-Workshop/config/gpte-subdomain-internal.txt"
+        mode: "400"
+        content: "{{ internal_domain }}"
+      
+    - name: "rhel10-setup - create gpte-pub-fqdn-shortname config files"
+      vars:
+        shortname: "{{ item | regex_replace('\\..*$') }}"
+        hostname: "{{ item | regex_replace('\\..*$') }}.{{ guid }}{{ subdomain_base_suffix }}"
+      ansible.builtin.copy:
+        dest: "/root/RHEL10-Workshop/config/gpte-pub-fqdn-{{ shortname }}.txt"
+        mode: "400"
+        content: "{{ hostname }}"
+      with_items:
+        - "{{ groups['isolated'] }}"
+        - "{{ groups['bastions'][0] }}"
+
+    - name: "rhel10-setup - create link to gpte config"
+      file:
+        src: "/root/RHEL10-Workshop/sample-configs/gpte/master-config.yml"
+        dest: "/root/RHEL10-Workshop/config/master-config.yml"
+        state: link
+
+    - name: "rhel10-setup - run the minimal workshop playbooks"
+      ansible.builtin.shell:
+        cmd: cd /root/RHEL10-Workshop; ./rhel10-workshop.sh prep
