@@ -15,7 +15,7 @@
 
     - name: "rhel10-setup - determine subdomain-internal from resolv.conf"
       ansible.builtin.shell:
-        cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }}
+        cmd: grep {{ guid }} /etc/resolv.conf | tr '[:space:] ' '\n' | grep {{ guid }} | head -n 1
       register: domain_result
 
     - name: "rhel10-setup - set fact internal_domain"
