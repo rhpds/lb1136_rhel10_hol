@@ -33,20 +33,20 @@
         bastion_pubkeys: "{{ pubkeys_result.stdout }}"
 
 
-# Every host in group 'isolated' except 'leapp'
-- name: Every host in group 'isolated' except 'leapp'
+# Every host in group 'rhel10_nodes' except 'leapp'
+- name: Every host in group 'rhel10_nodes' except 'leapp'
   when: 
-    - inventory_hostname in groups['isolated']
+    - inventory_hostname in groups['rhel10_nodes']
     - inventory_hostname_short != 'leapp'
   block:
 
-    - name: "rhel10_setup - working on hostgroup 'isolated' except 'leapp'"
+    - name: "rhel10_setup - working on hostgroup 'rhel10_nodes' except 'leapp'"
       ansible.builtin.lineinfile:
         state: present
         create: true
         insertafter: EOF
         dest: "/var/tmp/lb1136-progress.log"
-        line: "[{{ ansible_hostname }}] working on group isolated except leapp"
+        line: "[{{ ansible_hostname }}] working on group rhel10_nodes except leapp"
 
     ## NOTE: ansible-playbook errors with unsupported locale, resolved by installing glibc-all-langpacks
       
@@ -64,7 +64,7 @@
   ignore_errors: true
   become: true
   when: 
-    - inventory_hostname in groups['isolated']
+    - inventory_hostname in groups['rhel10_nodes']
     - inventory_hostname_short == 'node1'
   block:
 
@@ -121,7 +121,7 @@
         mode: "400"
         content: "{{ hostname }}"
       with_items:
-        - "{{ groups['isolated'] }}"
+        - "{{ groups['rhel10_nodes'] }}"
         - "{{ groups['bastions'][0] }}"
 
     - name: "rhel10-setup - create link to gpte config"

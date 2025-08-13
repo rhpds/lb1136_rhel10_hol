@@ -1,7 +1,7 @@
 ---
 - name: Register node2 with specific activationkeys
   when: 
-    - inventory_hostname in groups['isolated']
+    - inventory_hostname in groups['rhel10_nodes']
     - inventory_hostname_short == 'node2'
   block: 
     - name: Unregister From Subscription Manager

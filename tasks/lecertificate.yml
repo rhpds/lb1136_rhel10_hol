@@ -3,7 +3,7 @@
 - name: Block to generate LeCertificate for node3
   become: true
   when: 
-    - inventory_hostname in groups['isolated']
+    - inventory_hostname in groups['rhel10_nodes']
     - inventory_hostname_short == 'node3'
   block:
     - name: Install nginx
