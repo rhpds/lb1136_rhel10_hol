@@ -130,6 +130,10 @@
         dest: "/root/RHEL10-Workshop/config/master-config.yml"
         state: link
 
-    - name: "rhel10-setup - run the minimal workshop playbooks"
+    - name: "rhel10-setup - run the minimal (prep) workshop playbooks"
       ansible.builtin.shell:
         cmd: cd /root/RHEL10-Workshop; ./rhel10-workshop.sh prep
+
+    ## - name: "rhel10-setup - run the full (all) workshop playbooks in tmux detached shell"
+    ##  ansible.builtin.shell:
+    ##    cmd: cd /root/RHEL10-Workshop; ./sample-configs/gpte/workshop-setup-tmux.sh
